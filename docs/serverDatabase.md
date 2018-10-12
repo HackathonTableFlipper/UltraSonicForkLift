@@ -1,6 +1,6 @@
 | Device |      |      |
 | ------ | ---- | ---- |
-| <u>macaddress</u> | Varchar(48) | Unique |
+| <u>macaddress</u> | Varchar(12) | Unique |
 | name | Varchar(32) | Unique (Location) |
 | location | Varchar(32) |    |
 
