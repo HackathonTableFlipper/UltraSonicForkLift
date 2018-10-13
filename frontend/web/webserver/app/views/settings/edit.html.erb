@@ -1,0 +1,7 @@
+<h1>Settings</h1>
+
+<%= form_with url: settings_update_path do |form| %>
+  <p>Json-Server URI:</p>
+  <%= form.text_field :jsonServerUri, :value => @jsonServerUri %>
+  <%= form.submit %>
+<% end %>
