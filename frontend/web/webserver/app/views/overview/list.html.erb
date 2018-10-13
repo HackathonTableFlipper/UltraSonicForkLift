@@ -1,0 +1,22 @@
+<h1>Overview</h1>
+
+  <%= form_with url: overview_list_path do |form| %>
+    <%= form.text_field :ids, :value => @ids %>
+    <%= form.text_field :startTime, :value => @startTime %>
+    <%= form.text_field :endTime, :value => @endTime %>
+    <%= form.submit %>
+  <% end %>
+
+
+<table>
+  <tr><th>Zeile</th><th>Zeit</th><th>beladen</th><th>unbeladen</th><th>%</th></tr>
+  <% @overviewEntries.each.with_index do |overview, index| %>
+    <tr>
+      <td><%= index %></td>
+      <td><%= overview[:time] %></td>
+      <td><%= overview[:loadedTime] %></td>
+      <td><%= overview[:emptyTime] %></td>
+      <td><%= overview[:percentage] %></td>
+    </tr>
+  <% end %>
+</table>
