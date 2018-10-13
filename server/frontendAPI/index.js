@@ -27,7 +27,7 @@ handleConnection = (body, res) => {
     if(json.type) {
         res.writeHead(200, {'Content-Type': 'application/json'});
         obj = {"type": json.type, "data": null};
-        console.log(json.type);
+        
         switch(json.type) {
             case 'ListLocations':
                 return listLocations(obj, res);
