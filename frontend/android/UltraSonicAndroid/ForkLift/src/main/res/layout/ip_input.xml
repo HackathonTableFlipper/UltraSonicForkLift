@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_centerVertical="true"
+    android:background="@color/darkGrey"
+    android:gravity="center_vertical"
+    android:orientation="vertical">
+
+    <android.support.design.widget.TextInputLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="100dp"
+        android:layout_marginBottom="0dp"
+        android:layout_marginRight="50dp"
+        android:layout_marginLeft="50dp"
+        android:background="@color/brightLightGray"
+
+        >
+
+        <EditText
+            android:id="@+id/editText"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_margin="10dp"
+            android:layout_weight="10"
+            android:background="@color/brightLightGray"
+            android:ems="10"
+            android:hint="@string/inputServerUrl"
+            android:inputType="textUri"
+            android:textColor="@color/darkGrey"
+            android:textSize="20sp"
+
+            />
+
+    </android.support.design.widget.TextInputLayout>
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_margin="50dp"
+        android:layout_gravity="center"
+        >
+
+        <Button
+            android:id="@+id/button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@android:color/holo_orange_dark"
+            android:text="@string/connectButton"
+            android:textColor="@color/darkGrey"
+            android:textSize="30sp"
+            android:visibility="visible"
+            android:gravity="center"/>
+    </FrameLayout>
+
+</LinearLayout>
