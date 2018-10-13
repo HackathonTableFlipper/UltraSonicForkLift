@@ -18,7 +18,7 @@ response:
 }
 ```
 
-## ListDevices(InTimeSpan)
+## ListDevices
 request:
 ```
 {
@@ -43,7 +43,7 @@ response:
 }
 ```
 
-## OverviewForDevices(InTimeSpan)
+## OverviewForDevices
 request:
 ```
 {
@@ -70,7 +70,7 @@ response:
 }
 ```
 
-## DataForDevices(InTimeSpan)
+## DataForDevices
 request:
 ```
 {
