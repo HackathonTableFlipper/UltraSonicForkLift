@@ -1,6 +1,6 @@
 module LocationHelper
   def getNumberOfDevices
-    uri = URI.parse("http://172.16.7.71:8080/")
+    uri = URI.parse(Rails.configuration.jsonUri)
     header = {'Content-Type': 'text/json'}
     http = Net::HTTP.new(uri.host, uri.port)
     request = Net::HTTP::Post.new(uri.request_uri, header)
