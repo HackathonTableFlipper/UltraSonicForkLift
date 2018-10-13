@@ -7,14 +7,8 @@ var config = JSON.parse(fs.readFileSync('config.json', 'utf8'));
 var con = new Database(config.mysql);
 
 http.createServer(function (req, res) {
-
-    // Website you wish to allow to connect
     res.setHeader('Access-Control-Allow-Origin', '*');
-
-    // Request methods you wish to allow
     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE');
-
-    // Request headers you wish to allow
     res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With,content-type');
 
     let body = [];
@@ -60,6 +54,7 @@ handleConnection = (body, res) => {
 }
 
 sqlWrapper = (obj, res, query, func) => {
+    console.log(query);
     con.query(query).then(
         result => {
             obj.data = func(result);
@@ -94,7 +89,7 @@ listDevices = (obj, res, json) => {
         obj, 
         res, 
         'SELECT device.macaddress, name, location \
-            FROM forklift.device LEFT JOIN forklift.log ON device.macaddress \
+            FROM forklift.device LEFT JOIN forklift.log ON device.macaddress = log.macaddress \
             ' + (where.length > 0 ? ' WHERE ' + where.join(' AND ' ) : '') + ' \
             GROUP BY device.macaddress \
             ORDER BY location',
@@ -141,7 +136,7 @@ forDevices = (obj, res, json, func) => {
     sqlWrapper(
         obj, 
         res, 
-        'SELECT * FROM forklift.device LEFT JOIN forklift.log ON device.macaddress \
+        'SELECT * FROM forklift.device LEFT JOIN forklift.log ON device.macaddress = log.macaddress \
             WHERE ' + where.join(' AND ') + '\
             ORDER BY location, device.macaddress',
         (result) => {
