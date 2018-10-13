@@ -27,22 +27,27 @@ handleConnection = (body, res) => {
     if(json.type) {
         res.writeHead(200, {'Content-Type': 'application/json'});
         obj = {"type": json.type, "data": null};
+        console.log(json.type);
         switch(json.type) {
             case 'ListLocations':
-                listLocations(obj, res);
-                break;
+                return listLocations(obj, res);
 
             case 'ListDevices':
-                listDevices(obj, res, json);
-                break;
+                return listDevices(obj, res, json);
+
+            case 'ListOverview':
+                return listOverview(obj, res, json);
+
+            case 'ListData':
+                return listData(obj, res, json);
 
             default:
                 throw 'Unsupported Type';
         }
-
-    } else {
-        throw 'No Typ';
+        return;
     }
+
+    throw 'No Typ';
 }
 
 sqlWrapper = (obj, res, query, func) => {
@@ -69,9 +74,9 @@ listLocations = (obj, res) => {
 listDevices = (obj, res, json) => {
     let where = [];
     if(json.start)
-        where.push('start > ' + con.escape(new Date(json.start)));
+        where.push('start >= ' + con.escape(new Date(json.start)));
     if(json.end)
-        where.push('end < ' + con.escape(new Date(json.end)));
+        where.push('end <= ' + con.escape(new Date(json.end)));
     if(json.location)
         where.push('location = ' + con.escape(json.location) )
 
@@ -84,7 +89,71 @@ listDevices = (obj, res, json) => {
             GROUP BY device.macaddress \
             ORDER BY location',
         (result) => {
-            return result.map(e => {return {"id":e.macaddress,"name":e.name,"location":e.location}} );
+            return result.map(e => { return {
+                "id": e.macaddress,
+                "name": e.name,
+                "location": e.location
+            } } );
+        }
+    )
+}
+
+listOverview = (obj, res, json) => {
+    forDevices(
+        obj, res, json,
+        device => {return {
+            "id": device.id,
+            "name": device.name,
+            "location": device.location,
+            "loadedTime": device.loadedTimes.map(e => e[1]-e[0]).reduce( (r,a) => r+a, 0)/1000 | 0,
+            "emptyTime":   device.emptyTimes.map(e => e[1]-e[0]).reduce( (r,a) => r+a, 0)/1000 | 0,
+        }}
+    )
+}
+
+listData = (obj, res, json) => {
+    forDevices(
+        obj, res, json,
+        device => device
+    )
+}
+
+forDevices = (obj, res, json, func) => {
+    if(!json.devices || !Array.isArray(json.devices) || !json.start || !json.end)
+        throw "wrong arguments";
+
+    let where = [
+        'start >= ' + con.escape(new Date(json.start)),
+        'end <= ' + con.escape(new Date(json.end)),
+        '(' + json.devices.map( id => 'device.macaddress = ' + con.escape(id) ).join(' OR ') + ')'
+    ];
+
+    sqlWrapper(
+        obj, 
+        res, 
+        'SELECT * FROM forklift.device LEFT JOIN forklift.log ON device.macaddress \
+            WHERE ' + where.join(' AND ' ) + '\
+            ORDER BY location, device.macaddress',
+        (result) => {
+            devices = []
+            tmpDeviceMac = null;
+            result.forEach(d => {
+                elem = devices.length > 0 ? devices[devices.length-1] : null;
+                if(!elem || elem.id != d.macaddress) {
+                    devices.push({
+                        "id": d.macaddress, 
+                        "name": d.name, 
+                        "location": d.location, 
+                        "loadedTimes": [],
+                        "emptyTimes": []
+                    });
+                }
+                if(d.load)
+                    devices[devices.length-1].loadedTimes.push([d.start, d.end]);
+                else
+                    devices[devices.length-1].emptyTimes.push([d.start, d.end]);
+            })
+            return devices.map(func);
         }
     )
 }
