@@ -27,7 +27,7 @@ handleConnection = (body, res) => {
     if(json.type) {
         res.writeHead(200, {'Content-Type': 'application/json'});
         obj = {"type": json.type, "data": null};
-        
+
         switch(json.type) {
             case 'ListLocations':
                 return listLocations(obj, res);
@@ -119,7 +119,7 @@ listData = (obj, res, json) => {
 }
 
 forDevices = (obj, res, json, func) => {
-    if(!json.devices || !Array.isArray(json.devices) || !json.start || !json.end)
+    if(!json.devices || !Array.isArray(json.devices) || json.devices.length == 0 || !json.start || !json.end)
         throw "wrong arguments";
 
     let where = [
