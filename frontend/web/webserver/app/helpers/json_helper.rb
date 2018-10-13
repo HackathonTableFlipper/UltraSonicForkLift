@@ -1,3 +1,5 @@
+require 'net/http'
+
 module JsonHelper
   def getJsonForType(requestMessage)
     uri = URI.parse(Rails.configuration.jsonUri)
