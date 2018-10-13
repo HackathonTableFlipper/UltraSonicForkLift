@@ -32,3 +32,8 @@ Exit MySQL
 
 `sudo nano /etc/mysql/mariadb.conf.d/50-server.cnf`
 cange `bind-address = 127.0.0.1` to `bind-address = 0.0.0.0`
+
+curl -sL https://deb.nodesource.com/setup_10.x | sudo -E bash -
+apt update
+apt upgrade
+apt install -y nodejs
