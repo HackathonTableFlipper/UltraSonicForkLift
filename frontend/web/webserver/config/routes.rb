@@ -1,8 +1,10 @@
 Rails.application.routes.draw do
+  get 'overview/update'
   root 'location#list'
 
+  get 'graph/list'
   get 'overview/list'
-  post 'overview/list'
+  post 'overview/update'
   get 'settings/edit'
   post 'settings/update'
 

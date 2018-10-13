@@ -1,0 +1,25 @@
+<h1>Graph#list</h1>
+<div id="timeline" style="height: 180px;"></div>
+
+
+
+
+
+
+<script type="text/javascript">
+    google.charts.load('current', {'packages':['timeline']});
+    google.charts.setOnLoadCallback(drawChart);
+    function drawChart() {
+      var container = document.getElementById('timeline');
+      var chart = new google.visualization.Timeline(container);
+      var dataTable = new google.visualization.DataTable();
+
+      dataTable.addColumn({ type: 'string', id: 'President' });
+      dataTable.addColumn({ type: 'date', id: 'Start' });
+      dataTable.addColumn({ type: 'date', id: 'End' });
+      dataTable.addRows([
+        [ 'Jefferson',  new Date(1801, 2, 4, 12, 10, 00),  new Date(1809, 2, 4, 12, 12, 34) ]]);
+
+      chart.draw(dataTable);
+    }
+</script>

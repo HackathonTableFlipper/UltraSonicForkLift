@@ -7,13 +7,14 @@ class DeviceController < ApplicationController
                     "start" => nil,
                     "end" => nil,
                     "location" => nil})
+      puts response
     rescue Errno::EHOSTUNREACH
       redirect_to settings_edit_path
       return
     end
 
-    if response[:type] != "ListDevices"
-      @devices = [{:id => 0, :name => "Stapler 1", :location => "Tisch 11"}]
+    if response["type"] != "ListDevices"
+      raise "ListDevices response type was " + response["type"]
     else
       @devices = response["data"]
     end
