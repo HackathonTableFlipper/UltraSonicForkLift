@@ -35,7 +35,6 @@ handleConnection = (body, res) => {
     let json = JSON.parse(data);
 
     if(json.type) {
-        res.writeHead(200, {'Content-Type': 'application/json'});
         obj = {"type": json.type, "data": null};
 
         switch(json.type) {
@@ -63,7 +62,8 @@ handleConnection = (body, res) => {
 sqlWrapper = (obj, res, query, func) => {
     con.query(query).then(
         result => {
-            obj.data = func(result)
+            obj.data = func(result);
+            res.writeHead(200, {'Content-Type': 'application/json'});
             res.end( JSON.stringify(obj) );
         },
         err => {
@@ -142,7 +142,7 @@ forDevices = (obj, res, json, func) => {
         obj, 
         res, 
         'SELECT * FROM forklift.device LEFT JOIN forklift.log ON device.macaddress \
-            WHERE ' + where.join(' AND ' ) + '\
+            WHERE ' + where.join(' AND ') + '\
             ORDER BY location, device.macaddress',
         (result) => {
             devices = []
