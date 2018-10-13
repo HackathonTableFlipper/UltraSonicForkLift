@@ -1,8 +1,8 @@
 {
 	"mysql": {
+		"host": "127.0.0.1",
 		"user": "xxxx",
-		"pass": "xxxx",
-		"host": "127.0.0.1"
+		"password": "xxxx"
 	},
 	"port": "8080",
 }
