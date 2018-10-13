@@ -55,10 +55,10 @@ object OverviewContent {
                             , val percent: Int) {
         override fun toString(): String =
                 "Fork Lift Name:             $name\n" +
-                "Location:                   $location\n" +
-                "Total time of usage:        $all\n" +
-                "Time under load:            $loaded\n" +
-                "Time without load:          $unloaded\n" +
-                "Percent of loaded activity: $percent"
+                        "Location:                   $location\n" +
+                        "Total time of usage:        $all\n" +
+                        "Time under load:            $loaded\n" +
+                        "Time without load:          $unloaded\n" +
+                        "Percent of loaded activity: $percent"
     }
 }
