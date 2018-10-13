@@ -1,6 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<resources>
-    <string name="button">Button</string>
-    <string name="connectButton">Connect</string>
-    <string name="inputServerUrl">Server Url</string>
-</resources>

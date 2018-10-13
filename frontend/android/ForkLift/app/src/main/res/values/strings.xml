@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">ForkLift</string>
+    <string name="button_connect">Connect</string>
+    <string name="tip_url">Server URL</string>
+</resources>
