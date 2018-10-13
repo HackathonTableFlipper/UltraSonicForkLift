@@ -1,0 +1,13 @@
+<h1>Devices</h1>
+<p>Übersicht aller Devices</p>
+
+<table>
+  <tr><th>Nummer</th><th>Name</th><th>Location</th></tr>
+  <% @devices.each.with_index do |device, index| %>
+    <tr>
+      <td><%= index %></td>
+      <td><%= device[:name] %></td>
+      <td><%= device[:location] %></td>
+    </tr>
+  <% end %>
+</table>

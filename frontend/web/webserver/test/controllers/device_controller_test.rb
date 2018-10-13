@@ -1,8 +1,8 @@
 require 'test_helper'
 
-class LocationsControllerTest < ActionDispatch::IntegrationTest
+class DeviceControllerTest < ActionDispatch::IntegrationTest
   test "should get list" do
-    get locations_list_url
+    get device_list_url
     assert_response :success
   end
 
