@@ -1,0 +1,23 @@
+.bar-graph {
+	display: block;
+	width: 80%;
+	border-radius: .3em;
+	height: 2em;
+	border: 1px solid black;
+	display: flex;
+	justify-content: space-around;
+}
+
+.bar-graph > .bar-graph-loaded,
+.bar-graph > .bar-graph-empty {
+	height: 100%;
+	display: block;
+}
+
+.bar-graph > .bar-graph-loaded {
+	background-color: #80f080;;
+}
+
+.bar-graph > .bar-graph-empty {
+	background-color: #f08080;;
+}
