@@ -1,42 +1,91 @@
 var http = require('http');
-var mysql = require('mysql');
 var fs = require('fs');
+var Database = require('./Database.class.js');
 
 var config = JSON.parse(fs.readFileSync('config.json', 'utf8'));
 
-var con = mysql.createConnection({
-  host: config.mysql.host,
-  user: config.mysql.user,
-  password: config.mysql.pass
-});
-
-con.connect(function(err) {
-    if (err) throw err;
-    console.log("Connected!");
-});
+var con = new Database(config.mysql);
 
 http.createServer(function (req, res) {
-    let chunks = [];
+    let body = [];
+    req.on('data', (chunk) => {
+        body.push(chunk);
+    }).on('end', () => {
+        try {
+            handleConnection(body, res);
+        } catch (err) {
+            res.writeHead(500, {'Content-Type': 'text/html'});
+            res.end('<h1>Internal server error</h1> "' + err + '"');
+        }
+    });
+}).listen(config.port);
 
-    req.on('data', function(data) {
-      chunks.push(data);
-    }).on('end', function() {
-        let data = Buffer.concat(chunks);
-        let json = JSON.parse(data);
+handleConnection = (body, res) => {
+    let data = Buffer.concat(body).toString();
+    let json = JSON.parse(data);
 
-        console.log(json.type);
+    if(json.type) {
+        res.writeHead(200, {'Content-Type': 'application/json'});
+        obj = {"type": json.type, "data": null};
+        switch(json.type) {
+            case 'ListLocations':
+                listLocations(obj, res);
+                break;
 
-        if(json.type && json.type == 'ListLocations') {
-            con.query("SELECT location FROM forklift.device GROUP BY location ORDER BY location", function (err, result, fields) {
-                if (err) throw err;
-                res.writeHead(200, {'Content-Type': 'text/json'});
-                res.end(JSON.stringify({"type":json.type, "data": result.map(e => e.location) }));
-            });
-        } else {
-            res.writeHead(200, {'Content-Type': 'text/json'});
-            res.end("{}");
+            case 'ListDevices':
+                listDevices(obj, res, json);
+                break;
+
+            default:
+                throw 'Unsupported Type';
         }
 
-    });
+    } else {
+        throw 'No Typ';
+    }
+}
 
-}).listen(config.port);
+sqlWrapper = (obj, res, query, func) => {
+    con.query(query).then(
+        result => {
+            obj.data = func(result)
+            res.end( JSON.stringify(obj) );
+        },
+        err => {
+            throw err;
+        }
+    );
+}
+
+listLocations = (obj, res) => {
+    sqlWrapper(
+        obj, 
+        res, 
+        'SELECT location FROM forklift.device GROUP BY location ORDER BY location',
+        (result) => {return result.map(e => e.location)}
+    )
+}
+
+listDevices = (obj, res, json) => {
+    let where = [];
+    if(json.start)
+        where.push('start > ' + con.escape(new Date(json.start)));
+    if(json.end)
+        where.push('end < ' + con.escape(new Date(json.end)));
+    if(json.location)
+        where.push('location = ' + con.escape(json.location) )
+
+    sqlWrapper(
+        obj, 
+        res, 
+        'SELECT device.macaddress, name, location \
+            FROM forklift.device LEFT JOIN forklift.log ON device.macaddress \
+            ' + (where.length > 0 ? ' WHERE ' + where.join(' AND ' ) : '') + ' \
+            GROUP BY device.macaddress \
+            ORDER BY location',
+        (result) => {
+            return result.map(e => {return {"id":e.macaddress,"name":e.name,"location":e.location}} );
+        }
+    )
+}
+
