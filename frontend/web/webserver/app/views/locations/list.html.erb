@@ -1,0 +1,13 @@
+<h1>Locations</h1>
+<p>Übersicht aller Locations</p>
+
+<table>
+  <tr><th>Nummer</th><th>Location</th><th>Anzahl der Stapler</th></tr>
+  <% @locations.each.with_index do |location, index| %>
+    <tr>
+      <td><%= index %></td>
+      <td><%= location %></td>
+      <td></td>
+    </tr>
+  <% end %>
+</table>
