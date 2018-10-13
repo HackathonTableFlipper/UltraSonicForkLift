@@ -1,13 +1,23 @@
 package sonic.ultra.forklift.messages
 
-data class ListConnectionsRequest(
-        val type : String = "ListConnections"
+import com.beust.klaxon.*
+import com.beust.klaxon.EnumConverter
+import org.json.JSONArray
+
+data class ListLocationsRequest(
+        val type : String = "ListLocations"
 )
 
-data class ListConnectionsRepsonse(
-        val type : String = "ListConnections",
-        val locations: List<Location>
+data class ListLocationsRepsonse(
+        val type : String = "ListLocations",
+        val data: List<Location>
 )
+
+class StringConverter : Converter {
+    override fun toJson(value: Any): String = value.toString()
+    override fun fromJson(jv: JsonValue) = jv.inside.toString()
+    override fun canConvert(cls: Class<*>) : Boolean = cls == String.javaClass
+}
 
 data class ListDevicesRequest(
         val type : String = "ListDevices",
@@ -48,10 +58,21 @@ data class DataForDevicesRepsonse(
 
 
 // AST
-
+data class StringObject(
+        val value : String
+)
 typealias Location = String
 typealias Id = String
 typealias DateTimeString = String?
+//data class Location(
+//        val value: String
+//)
+//data class Id(
+//        val value : String
+//)
+//data class DateTimeString(
+//        val value: String?
+//)
 
 data class Device(
         val id : Id,
