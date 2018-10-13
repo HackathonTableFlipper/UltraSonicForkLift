@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="x-ua-compatible" content="ie=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+        <script src="https://code.jquery.com/jquery-3.3.1.min.js"integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
+
+        <link rel="stylesheet" href="css/foundation.css">
+        <link rel="stylesheet" href="css/app.css">
+    </head>
+    <body>
+        <div class="grid-container">
+            <div class="grid-x grid-padding-x">
+                <div class="large-12 cell">
+                    <h1>UltraSonic Fork Lift</h1>
+                </div>
+            </div>
+            <div class="grid-x grid-padding-x">
+                <div class="large-12 cell">
+                    <h2>Locations</h2>
+                    <div id="list-locations">
+                        loading...
+                    </div>
+                </div>
+                <div class="large-12 cell">
+                    <h2>Devices</h2>
+                    <div id="list-devices">
+                       No Devices
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <script type="text/javascript">
+            const API_URL = 'http://172.16.7.71:8080/';
+
+            loadLocations = () => {
+                load(
+                    {"type":"ListLocations"}, 
+                    (res) => {
+                        $list = $('#list-locations').html('');
+                        res.data.forEach(el => {
+                            $(`<button>${el}</button>`)
+                                .click( () => {
+                                    loadForkLifts(el)
+                                })
+                                .appendTo($list)
+                        })
+                    }
+                )
+            }
+
+            loadForkLifts = (location) => {
+                load(
+                    {"type":"ListDevices", "location": location}, 
+                    (res) => {
+                        $list = $('#list-devices').html('');
+                        res.data.forEach(el => {
+                            $(`<button>${el.name}</button>`)
+                                .click( () => {
+
+                                })
+                                .appendTo($list)
+                        })
+                    }
+                )
+            }
+
+            load = (data, success) => {
+                $.ajax({
+                    url: API_URL,
+                    data: JSON.stringify(data),
+                    type: "POST",
+                    success: success
+                });
+            }
+
+
+            loadLocations();
+        </script>
+    </body>
+</html>
