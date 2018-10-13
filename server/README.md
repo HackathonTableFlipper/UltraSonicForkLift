@@ -12,20 +12,20 @@ Enter password
 `GRANT SELECT ON forklift.* TO 'frontend'@'%' WITH GRANT OPTION;`
 `GRANT ALL PRIVILEGES ON forklift.* TO 'backend'@'%' WITH GRANT OPTION;`
 `FLUSH PRIVILEGES;`
-```
+```sql
 CREATE TABLE `forklift`.`device` (
  `macaddress` VARCHAR(12) NOT NULL,
  `name` VARCHAR(32) NOT NULL,
  `location` VARCHAR(32) NOT NULL,
  PRIMARY KEY (`macaddress`));
 ```
-```
+```sql
 CREATE TABLE `forklift`.`log` (
   `macaddress` VARCHAR(12) NOT NULL,
   `load` TINYINT(1) NOT NULL,
   `start` DATETIME NOT NULL,
   `end` DATETIME NOT NULL,
-  PRIMARY KEY (`macaddress`));
+  PRIMARY KEY (`macaddress`, `load`, `start`, `end`));
 ```
 
 Exit MySQL
