@@ -22,6 +22,13 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/ForkLiftClient/core/core}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/ForkLiftClient/core/variant}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/ForkLiftClient/libraries/SoftwareSerial/src}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/ForkLiftClient/libraries/WiFiEsp/src}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/ForkLiftClient/microcontroller}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/ForkLiftClient/libraries/Ethernet/src}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/ForkLiftClient/libraries/NewPing/src}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/ForkLiftClient/libraries/RTClib}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/ForkLiftClient/libraries/Wire/src}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/ForkLiftClient/libraries/SPI/src}&quot;"/>
 								</option>
 								<inputType id="io.sloeber.compiler.cpp.sketch.input.1338563826" name="CPP source files" superClass="io.sloeber.compiler.cpp.sketch.input"/>
 							</tool>
@@ -30,6 +37,13 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/ForkLiftClient/core/core}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/ForkLiftClient/core/variant}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/ForkLiftClient/libraries/SoftwareSerial/src}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/ForkLiftClient/libraries/WiFiEsp/src}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/ForkLiftClient/microcontroller}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/ForkLiftClient/libraries/Ethernet/src}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/ForkLiftClient/libraries/NewPing/src}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/ForkLiftClient/libraries/RTClib}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/ForkLiftClient/libraries/Wire/src}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/ForkLiftClient/libraries/SPI/src}&quot;"/>
 								</option>
 								<inputType id="io.sloeber.compiler.c.sketch.input.578072909" name="C Source Files" superClass="io.sloeber.compiler.c.sketch.input"/>
 							</tool>
@@ -38,6 +52,13 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/ForkLiftClient/core/core}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/ForkLiftClient/core/variant}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/ForkLiftClient/libraries/SoftwareSerial/src}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/ForkLiftClient/libraries/WiFiEsp/src}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/ForkLiftClient/microcontroller}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/ForkLiftClient/libraries/Ethernet/src}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/ForkLiftClient/libraries/NewPing/src}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/ForkLiftClient/libraries/RTClib}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/ForkLiftClient/libraries/Wire/src}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/ForkLiftClient/libraries/SPI/src}&quot;"/>
 								</option>
 								<inputType id="io.sloeber.compiler.S.sketch.input.1017810054" name="Assembly source files" superClass="io.sloeber.compiler.S.sketch.input"/>
 							</tool>
@@ -48,7 +69,7 @@
 						</toolChain>
 					</folderInfo>
 					<sourceEntries>
-						<entry excluding="libraries/?*/**/?xamples/**|libraries/?*/**/?xtras/**|libraries/?*/**/test*/**|libraries/?*/**/third-party/**|libraries/**/._*|libraries/?*/utility/*/*" flags="VALUE_WORKSPACE_PATH" kind="sourcePath" name=""/>
+						<entry excluding="libraries/?*/**/test*/**|libraries/?*/**/third-party/**|libraries/?*/utility/*/*|libraries/?*/**/?xamples/**|libraries/?*/**/?xtras/**|libraries/**/._*" flags="VALUE_WORKSPACE_PATH" kind="sourcePath" name=""/>
 					</sourceEntries>
 				</configuration>
 			</storageModule>

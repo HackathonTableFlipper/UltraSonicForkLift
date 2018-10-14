@@ -16,6 +16,7 @@
  */
 
 #include "Header/ForkLiftClient.h"
+#include "Header/sonicClockMinimal.h"
 
 SoftwareSerial esp8266(RX,TX);
 String AP = "hackathon";
@@ -44,15 +45,18 @@ void setup()
   }
 
   //TODO check, if we can connect to a Wifi and the device is set
-  setupServer();
+  //setupServer();
 
   //TODO if not: Open a server
-  setupClient();
+  //setupClient();
+
+  //Serial.println("bla " + getConfigPage());
+  Serial.println(setupSonicClockMinimal());
 
 }
 
 void setupClient(){
-	sendData("AT+CWJAP=\""+ AP +"\",\""+ PASS +"\"",20,false);
+	//sendData("AT+CWJAP=\""+ AP +"\",\""+ PASS +"\"",20,false);
 }
 
 void setupServer(){
@@ -61,34 +65,33 @@ void setupServer(){
 	sendData("AT+CWSAP=\"ESP_8266\",\"abcdefgh\",11,0",timeout,false);
 	sendData("AT+CIPMUX=1",timeout,false); // configure for multiple connections
 	sendData("AT+CIPSERVER=1,80",timeout,true); // turn on server on port 80
-	sendData("AT+CIFSR",timeout,false); // get ip address
+	sendData("AT+CIFSR",timeout,true); // get ip address
 }
 
 void loop()
 {
-	handleClient();
+	//handleClient();
+	Serial.print(loopSonicClockMinimal());
 }
 
 void handleClient(){
-	if(esp8266.available()) // check if the ESP8266 is sending data
-	      {
-	          // this is the +IPD reply - it is quite long.
-	          // normally you would not need to copy the whole message in to a variable you can copy up to "HOST" only
-	          // or you can just search the data character by character as you read the serial port.
-	          getReply( 2000 );
-	              // start sending the HTML
-	          	  //Serial.println("handle client");
-
-	              strcpy(html,"Hello World\r\n");
-	              strcpy(command,"AT+CIPSEND=0,12\r\n");
-	              esp8266.print(command);
-	              getReply( 2000 );
-	              esp8266.print(html);
-	              getReply( 2000 );
-	              esp8266.print("AT+CIPCLOSE=0\r\n");
-	      }
-	      delay(100);
-	      // drop to here and wait for next request.
+	//TODO: argument finden, dass nur reagiert
+//	if(esp8266.available()) // check if the ESP8266 is sending data
+//	      {
+//	          // this is the +IPD reply - it is quite long.
+//	          // normally you would not need to copy the whole message in to a variable you can copy up to "HOST" only
+//	          // or you can just search the data character by character as you read the serial port.
+//	              // start sending the HTML
+//	          	  //Serial.println("handle client");
+//
+//	              strcpy(html, "Hello\r\n");
+//	              strcpy(command,"AT+CIPSEND=6,\r\n");
+//	              esp8266.print(command);
+//	              esp8266.print(html);
+//	              esp8266.print("AT+CIPCLOSE=0\r\n");
+//	              Serial.println("Done");
+//	      }
+//	      // drop to here and wait for next request.
 }
 
   //////////////////////////////sends data from ESP to webpage///////////////////////////
@@ -125,22 +128,59 @@ String sendData(String command, const int timeout, boolean debug)
                 return response;
             }
 
-void getReply(int wait)
-{
-    int tempPos = 0;
-    long int time = millis();
-    while( (time + wait) > millis())
-    {
-        while(esp8266.available())
-        {
-            char c = esp8266.read();
-            if (tempPos < 500) { reply[tempPos] = c; tempPos++;   }
-        }
-        reply[tempPos] = 0;
-    }
-}
-
 
 bool sendDataToRaspberry(int gabelstabler_id,bool, float startTime, float endTime){
-
+	return false;
 }
+
+//const String getConfigPage(){
+//	String webpage_index = "<!DOCTYPE html>" ;
+//	webpage_index += "<html>";
+//	webpage_index += "<head>";
+//	webpage_index += "<title>Init Ultrasonic Frok Lift </title>";
+////	webpage_index += "<style>";
+////	webpage_index += ".content {max-width: 500px; margin: auto;}";
+////	webpage_index += "form {width:\"25em\"; border: 1px solid gainsboro;}";
+////	webpage_index += "input {margin: 0 0 1em 1em;}";
+////	webpage_index += "label {float: left; text-align: right; width: 10em;}";
+////	webpage_index += ".button {margin-left: 11em;}";
+////	webpage_index += "</style>";
+//	webpage_index += "</head>";
+//	webpage_index += "<body>";
+//	webpage_index += "<h1>Hello World!</h1>";
+////	webpage_index += "<div class=\"content\">";
+////	webpage_index += "<center>";
+////	webpage_index += "<form>";
+////	webpage_index += "<label for=\"ID\">";
+////	webpage_index += "ID:";
+////	webpage_index += "</label>";
+////	webpage_index += "<input type=\"number\" id=\"ID\" min=\"0\" size=\"4\" required>";
+////	webpage_index += "<br>";
+////	webpage_index += "Please make sure that the used ID isn't already taken.";
+////	webpage_index += "<label for=\"name\">Name:</label>";
+////	webpage_index += "<input type=\"text\" id=\"name\"  maxlength=\"20\" required>";
+////	webpage_index += "<br>";
+////	webpage_index += "<label for=\"location\">Location:</label>";
+////	webpage_index += "<input type=\"text\" id=\"location\" maxlength=\"20\" required>";
+////	webpage_index += "<br>";
+////	webpage_index += "<label for=\"ssid\">SSID:</label>";
+////	webpage_index += "<input type=\"text\" id=\"ssid\" maxlength=\"32\" required><br>";
+////	webpage_index += "<label for=\"password\">Password:</label>";
+////	webpage_index += "<input type=\"password\" id=\"password\" maxlength=\"63\" required>"<br>";
+////	webpage_index += "<p>";
+////	webpage_index += "When you click on this button, the microcontroller will try connect to the specified Wi";
+////	webpage_index += "<br>";
+////	webpage_index += "If the connection can't be implemented within 2 minutes, ";
+////	webpage_index += "the microcontroller will reset himself and open his own WiFi again.";
+////	webpage_index += "</p>";
+////	webpage_index += "<button type=\"button\" id=\"send\">Initialize the microcontroller</button>";
+////	webpage_index += "<!-- TODO: Error message field -->";
+////	webpage_index += "</form>";
+////	webpage_index += "</center>";
+////	webpage_index += "</div>";
+//	webpage_index += "</body>";
+//	webpage_index += "</html>";
+//	webpage_index += "";
+////
+//	return webpage_index;
+//}
