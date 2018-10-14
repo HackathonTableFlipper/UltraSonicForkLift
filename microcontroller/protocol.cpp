@@ -31,12 +31,12 @@ bool RequestServer(char message[]){
         println("The length of the message was to long (len). Couldn't send.");
         return false;
     }
-    
+
     // try to send the message to the server five times
     bool status = false;
     for(int i = 0; i < 5 && ! status; ++i){
         status = sendToServer(message);
-    esp.request("AT+CIPSEND=" + strlen(message), 
+    esp.request("AT+CIPSEND=" + strlen(message),
     serverIP,<remote port>])
     // TODO read response 200 or error?
         if(status) {
@@ -64,9 +64,7 @@ bool setup(){
 }
 
 char[] dateTime2JSON(DateTime t){
-    char jsontime[20] = "0000-00-00 00:00:00";
-    std::cout << std::setw(5) << std::setfill('0') << zipCode << std::endl;
-
+    return = t.year() + "-" + t.month() + "-" + t.day() + " " + t.hour() + ":" + t.minute() + ":" + t.day();
 }
 
 enum savestate logData(bool loaded, DateTime starttime, DateTime endtime){
