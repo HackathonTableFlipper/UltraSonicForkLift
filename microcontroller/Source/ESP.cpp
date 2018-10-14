@@ -10,9 +10,26 @@
 //
 //setup
 //
-//byte[4] get_MAC_ADRESS(){
-//    return {0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xED};
-//}
+String get_MAC_ADDRESS(){
+    /**
+     * Response Fromat:
+     *
+     * +CIFSR:APIP,<SoftAP IP address>
+     * +CIFSR:APMAC,<SoftAP MAC address>
+     * +CIFSR:STAIP,<Station IP address>
+     * +CIFSR:STAMAC,<Station MAC address>
+     * OK
+     */
+
+    String response = sendCommand("AT+CIFSR");
+
+    // get the line with the mac adress
+    String mac = response.substring(44,44+12+5);
+    // remove the :
+    mac = mac.erase(std::remove(str.begin(), str.end(), ':'), str.end());
+
+    return mac;
+}
 //
 ////////////////gets the data from esp and displays in serial monitor///////////////////////
 //String sendData(String command, const int timeout=2000, bool debug=false)
