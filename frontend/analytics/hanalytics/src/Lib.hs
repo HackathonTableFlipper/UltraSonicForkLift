@@ -10,14 +10,17 @@ import Network.HTTP
 import Network.Stream
 import Network.HTTP.Headers
 import Network.HTTP.Base
-import Network.Mail.SMTP
-import Network.Mail.Mime
+import Network.Mail.SMTP 
+import Network.Mail.Mime hiding (simpleMail)
 import Network.URI
 import Control.Concurrent.MVar
 import Control.Concurrent
 import System.Environment
 import Data.ByteString.Lazy hiding (filter,map, head, null, tail, putStrLn)
+import qualified Data.ByteString.Char8 as C
+import Data.ByteString.Search
 import Data.Aeson
+import Data.Text.Encoding
 import qualified Data.Text.Internal as T
 
 
@@ -36,7 +39,7 @@ mailLoopStart mmaillist = do
     args <- getArgs
     case args of
         [] -> return ()
-        xs -> mailloop mmaillist $ URI "http:" (Just (URIAuth "" (head args) (head $ tail args))) "" "" ""
+        xs -> mailloop mmaillist $ "http://"++ (head args) ++ (head $ tail args) 
 
 
 mailloop mmaillist url = do
@@ -58,13 +61,13 @@ sendmails mmaillist = do
 
 
 createMail (hostname, adressString) = 
-    (hostname, Mail 
+    (hostname, simpleMail 
         (Address (Just "Hanalytics") "hanalytics@haskell.lambda")
         [Address (Just "Expert") (adressString)] 
         []
-        []
-        []
-        [[Part "Hanalytics Mail" None Nothing [] "Some Fork Lifters are used less than 10 percent their time with load, check out the webpage for further information"]])
+        []  
+        "Hanalytics Mail"      
+        [plainTextPart "Some Fork Lifters are used less than 10 percent their time with load, check out the webpage for further information"])
 
 
 hanalytics url = do 
@@ -74,21 +77,41 @@ hanalytics url = do
     overResp <- simpleHTTP $ createOverRequest url devIds
     putStrLn $ "DEBUG | " ++ show overResp
     result <- hanalyse' overResp
+    putStrLn $ "DEBUG | " ++ "Resutls of the calculation: trigger=" ++ show result
     return result
 
 headers = [
         Header HdrAccept "text/*"
     ]
 
-createDeviceRequest url = Request url POST headers $ encode $ LDQ "ListDevices" "null" "null" "null"
-createOverRequest url deviceIds = Request url POST headers $ encode $ OQ "ListOverview" deviceIds "2000-1-1 12:00" "2020-1-1 12:00"
+contentType = "Conent-Type:text/json"
+
+replaceNull :: C.ByteString -> ByteString
+replaceNull = replace escapedNull notEscapedNull
+    where 
+        escapedNull :: C.ByteString
+        escapedNull = "\"null\""
+        notEscapedNull :: C.ByteString
+        notEscapedNull = "null"
+
+ldqJson :: String
+ldqJson = C.unpack $ toStrict $ replaceNull $ toStrict $ encode $ LDQ "ListDevices" "2000-1-1 12:00" "2020-1-1 12:00" "null"
+
+oqJson :: [String] -> String
+oqJson deviceIds = C.unpack $ toStrict $ encode $ OQ "ListOverview" deviceIds "2000-1-1 12:00" "2020-1-1 12:00"
+
+createDeviceRequest url = postRequestWithBody url contentType $ ldqJson
+createOverRequest url deviceIds = postRequestWithBody url contentType $ oqJson deviceIds
 
 
 getDeviceIds' (Left connError) = return []
 getDeviceIds' (Right response) = getDeviceIds response
 
-getDeviceIds (Response _ _ _ body) = do
-    let devices = decode body :: Maybe LDResponse
+getDeviceIds (Response _ _ _ stringbody) = do
+    putStrLn $ "DEBUG | " ++ "body of the response: " ++ show stringbody
+    let byteBody = fromStrict $ C.pack stringbody
+    let devices = decode byteBody :: Maybe LDResponse
+    putStrLn $ "DEBUG | " ++ "Decoded deviceList message: " ++ show devices
     case devices of
         Nothing -> return []
         Just (LDA _ ds) -> return $ map (\(D id _ _) -> id) $ ds
@@ -99,8 +122,11 @@ hanalyse' (Left connError) = return False
 hanalyse' (Right response) = hanalyse response
 -- Hanalytics
 --hanalyse :: Response ByteString -> IO Bool
-hanalyse (Response _ _ _ body) = do
-      let overview = decode body :: Maybe OResponse
+hanalyse (Response _ _ _ stringbody) = do
+      putStrLn $ "DEBUG | " ++ "body of the response: " ++ show stringbody
+      let byteBody = fromStrict $ C.pack stringbody
+      let overview = decode byteBody :: Maybe OResponse
+      putStrLn $ "DEBUG | " ++ "Decoded Overview message: " ++ show overview
       case overview of
         Nothing -> return False
         Just (OA _ oes) -> do
