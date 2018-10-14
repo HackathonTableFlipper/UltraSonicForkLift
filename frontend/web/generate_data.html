@@ -1,0 +1,45 @@
+<html>
+
+	<head>
+		
+        <script src="https://code.jquery.com/jquery-3.3.1.min.js"integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
+	</head>
+
+	<body>
+		<script type="text/javascript">
+			const API_URL = 'http://172.16.7.71:9001/';
+
+			fireData = (data) => {
+				$.ajax({
+	                url: API_URL,
+	                data: JSON.stringify(data),
+	                type: "POST"
+	            });
+			}
+
+			i = 0;
+			data = [];
+			start = new Date("2018-10-14 08:00:00");
+			end = null;
+			loaded = true;
+			while(i < 640) {
+				i++;
+
+				loaded = loaded ? (Math.random() > .8 ? 1 : 0) : (Math.random() > .8 ? 0 : 1)
+
+				end = new Date(+start+(Math.random()*170+10)*1000); // 0.1min - 3min
+				data.push({
+					load: loaded,
+					start: start,
+					end: end
+				});
+
+				start = new Date(+end+ (Math.random() > .25 ? (Math.random()*120)*1000 : 0) )
+			}
+			
+			fireData({type:"log", mac:"123456789abc", data:data});
+
+		</script>
+	</body>
+
+</html>
