@@ -9,16 +9,17 @@
       var chart = new google.visualization.Timeline(container);
       var dataTable = new google.visualization.DataTable();
 
-      dataTable.addColumn({ type: 'string', id: 'President' });
+      dataTable.addColumn({ type: 'string', id: 'Stapler' });
+      dataTable.addColumn({ type: 'string', id: 'Zustand' });
       dataTable.addColumn({ type: 'date', id: 'Start' });
       dataTable.addColumn({ type: 'date', id: 'End' });
       dataTable.addRows([
         <% @dataEntries.each do |data| %>
           <% data["loadedTimes"].each do |entry| %>
-            ["<%= data["name"] %>(<%= data["id"] %>)",  new Date(<%= entry[0] %>),  new Date(<%= entry[1] %>) ],
+            ["<%= data["name"] %>(<%= data["id"] %>)", 'beladen', new Date(<%= entry[0] %>),  new Date(<%= entry[1] %>) ],
           <% end %>
           <% data["emptyTimes"].each do |entry| %>
-            ["<%= data["name"] %>(<%= data["id"] %>)",  new Date(<%= entry[0] %>),  new Date(<%= entry[1] %>) ],
+            ["<%= data["name"] %>(<%= data["id"] %>)", 'unbeladen', new Date(<%= entry[0] %>),  new Date(<%= entry[1] %>) ],
           <% end %>
         <% end %>
       ]);
