@@ -12,6 +12,7 @@
 
 bool request(String ip, String port, String message);
 String sendData(String command, const int timeout, bool debug=false);
+String get_MAC_ADDRESS();
 
 
 

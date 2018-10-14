@@ -18,6 +18,7 @@ enum savestate {UPLOADED, CACHED, FAIL};
 
 bool requestServer(String message);
 String dateTime2JSON(DateTime t);
+enum savestate logData(bool loaded, DateTime starttime, DateTime endtime);
 
 
 

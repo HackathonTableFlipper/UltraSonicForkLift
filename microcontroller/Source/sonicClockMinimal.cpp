@@ -15,6 +15,8 @@ unsigned long taskLastRun[3]={0, 0, 0};
 unsigned long lastMove=0;
 uint8_t drivCount=0;
 
+DateTime startTime(0,0,0,0,0,0);
+
 String setupSonicClockMinimal() {
   taskLastRun[0]=millis();
   String returnStr = "setup sonicClockMinimal: ";
@@ -37,6 +39,10 @@ String setupSonicClockMinimal() {
   pinMode(6,OUTPUT);
   digitalWrite(6,HIGH);
   digitalWrite(5,LOW);
+
+  pinMode(2,OUTPUT);
+  digitalWrite(2,HIGH);
+
   return returnStr;
 }
 
@@ -52,9 +58,10 @@ String loopSonicClockMinimal() {
     if (state==0xf000) {
       
     //RTC auslesen
-      DateTime now = rtc.now();
-     returnStr += now.unixtime() + (payloadState?": Ladung aufgenommen":": Ladung entfernt") + "\n";
-      payloadState= !payloadState;
+    DateTime now = rtc.now();
+    returnStr += String(now.unixtime()) + String((payloadState? ": Ladung aufgenommen":": Ladung entfernt")) + "\n";
+    //logData(bool payloadState, DateTime starttime, DateTime endtime)
+    payloadState= !payloadState;
     }
   }
 
@@ -69,7 +76,8 @@ String loopSonicClockMinimal() {
         
         if(drivCount>20) {
           DateTime now = rtc.now();
-          returnStr += now.unixtime() + ": Losgefahren\n";
+          returnStr += String(now.unixtime()) + ": Losgefahren\n";
+          //logData(bool payloadState, DateTime starttime, DateTime endtime)
           isDriving=true;
           
         } else {
@@ -84,9 +92,11 @@ String loopSonicClockMinimal() {
       if(isDriving==true) {
         isDriving=false;
         DateTime now = rtc.now();
-        returnStr+= now.unixtime() + ": Angehalten\n";
+        returnStr+= String(now.unixtime()) + ": Angehalten\n";
+        //logData(bool payloadState, DateTime starttime, DateTime endtime)
       }
       drivCount=0;
     }
   }
+  return returnStr;
 }

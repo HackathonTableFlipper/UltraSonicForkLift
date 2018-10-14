@@ -63,12 +63,12 @@ String dateTime2JSON(DateTime t){
 
 enum savestate logData(bool loaded, DateTime starttime, DateTime endtime){
     // collect the neccesary data
-    String mac = "";//"\"" + esp.get_MAC_ADRESS() + "\"";
+    String mac = "\"" + get_MAC_ADDRESS() + "\"";
     String type = "\"log\"";
     String data = "[{\"load\":" + String(loaded) + ", \"start\":" + dateTime2JSON(starttime) + "\"end\":" + dateTime2JSON(endtime) + "}]";
 
     // create the message
-    String message = "{MAC " + mac + ",TYPE " + type + ", DATA" + data + "}";
+    String message = "{MAC:" + mac + ",TYPE:" + type + ",DATA:" + data + "}";
 
     // send the message
     if(requestServer(message)){

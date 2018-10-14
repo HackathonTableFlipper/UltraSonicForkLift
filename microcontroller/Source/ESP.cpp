@@ -50,12 +50,15 @@ String get_MAC_ADDRESS(){
      * OK
      */
 
-    String response = sendCommand("AT+CIFSR");
+    String response = sendData("AT+CIFSR",10,false);
+
+    int start = response.indexOf("CIFSR:APMAC,")+13;
+    int end = start+12+5;
 
     // get the line with the mac adress
-    String mac = response.substring(44,44+12+5);
+    String mac = response.substring(start,end);
     // remove the :
-    mac = mac.erase(std::remove(str.begin(), str.end(), ':'), str.end());
+    mac.replace(":", "");
 
     return mac;
 }

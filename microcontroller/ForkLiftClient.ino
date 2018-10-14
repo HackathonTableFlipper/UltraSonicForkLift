@@ -57,14 +57,17 @@ void setup()
   //setupServer();
 
   //TODO if not: Open a server
-  setupClient();
+  //setupClient();
 
   Serial.println(setupSonicClockMinimal());
+
+  //logData(true, DateTime(1,1,1,1,1,1), DateTime(1,1,1,1,1,1));
 }
 
 void setupClient(){
-	sendData("AT+CWJAP=\""+ AP +"\",\""+ PASS +"\"",20,true);
-	sendData("AT+CIPMODE=0\r\n",20,true);
+	sendData("AT+CWMODE=1",200,false); // configure as access point
+	sendData("AT+CWJAP=\""+ AP +"\",\""+ PASS +"\"",200,true);
+	sendData("AT+CIPMODE=0\r\n",200,true);
 }
 
 void setupServer(){
