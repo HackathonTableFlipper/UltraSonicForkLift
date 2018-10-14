@@ -2,10 +2,10 @@
 <p>Übersicht aller Devices</p>
 
 <table>
-  <tr><th>Nummer</th><th>Name</th><th>Location</th></tr>
+  <tr><th>ID</th><th>Name</th><th>Location</th></tr>
   <% @devices.each.with_index do |device, index| %>
     <tr>
-      <td><%= index %></td>
+      <td><%= device["id"] %></td>
       <td><%= device["name"] %></td>
       <td><%= device["location"] %></td>
     </tr>

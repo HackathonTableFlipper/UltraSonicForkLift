@@ -7,6 +7,26 @@
 
         <script src="https://code.jquery.com/jquery-3.3.1.min.js"integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
 
+        <script type="text/javascript">
+            Date.prototype.getMonday = function() {
+                var day = this.getDay();
+                return this.addDays( - day + (day == 0 ? -6 : 1) );
+            }
+
+            Date.prototype.addDays = function(days) {
+                return new Date(new Date(this).setDate(this.getDate() + days))
+            }
+
+            load = (data, success) => {
+                $.ajax({
+                    url: API_URL,
+                    data: JSON.stringify(data),
+                    type: "POST",
+                    success: success
+                });
+            }
+        </script>
+
         <link rel="stylesheet" href="css/foundation.css">
         <link rel="stylesheet" href="css/app.css">
     </head>
@@ -17,12 +37,19 @@
                     <h1>UltraSonic Fork Lift</h1>
                 </div>
             </div>
-            <div class="grid-x grid-padding-x">
+            <div class="grid-x grid-padding-x">  
                 <div class="large-12 cell">
                     <h2>Locations</h2>
                     <div id="list-locations">
                         loading...
-                    </div>
+                    </div> 
+                    <input type="date" value="2018-10-13" />         
+                    <select id="duration">
+                        <option value="day">Day</option>
+                        <option value="week">Week</option>
+                        <option value="month">Month</option>
+                        <option value="year">Year</option>
+                    </select>
                 </div>
                 <div class="large-12 cell">
                     <h2>Devices</h2>
@@ -31,12 +58,6 @@
                     </div>
                 </div>
                 <div class="large-12 cell">
-                    <select id="duration">
-                        <option value="day">Today</option>
-                        <option value="week">Week</option>
-                        <option value="month">Month</option>
-                        <option value="year">Year</option>
-                    </select>
                     <div id="device">
                     </div>
                 </div>
@@ -44,8 +65,53 @@
         </div>
 
         <script type="text/javascript">
-            // const API_URL = 'http://172.16.7.71:8080/';
-            const API_URL = 'http://localhost:8080/';
+            const API_URL = 'http://172.16.7.71:8080/';
+            // const API_URL = 'http://localhost:8080/';
+
+            let today = new Date();
+            let start = null;
+            let end = null;
+
+            getDate = () => {
+                today = new Date($('input[type="date"]').val());
+                getDuration();
+            }
+
+            getDuration = () => {
+                today.setHours(0,0,0,0);
+                switch($('#duration').val()) {
+                    case 'day':
+                        start = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+                        end   = new Date(today.getFullYear(), today.getMonth(), today.getDate()+1);
+                        break;
+
+                    case 'week':
+                        start = today.getMonday();
+                        end = start.addDays(6);
+                        break;
+
+                    case 'month':
+                        start = new Date(today.getFullYear(), today.getMonth(), 1);
+                        end   = new Date(today.getFullYear(), today.getMonth()+1, 0);
+                        break;
+
+                    case 'year':
+                        start = new Date(today.getFullYear(), 1, 1);
+                        end   = new Date(today.getFullYear(), 12, 0);
+                        break;
+                }
+
+                // start.setHours(0,0,0,0);
+                // end.setHours(23,59,59,0);
+            }
+
+            $('#duration').change( getDuration );
+            getDuration();
+
+            $('input[type="date"]')
+                .val(new Date().toISOString().split('T')[0])
+                .change( getDate );
+
 
             loadLocations = () => {
                 load(
@@ -66,94 +132,95 @@
             loadForkLifts = (location) => {
                 load(
                     {"type":"ListDevices", "location": location}, 
-                    (res) => {
-                        $list = $('#list-devices').html('');
-                        res.data.forEach(el => {
-                            $(`<button>${el.name}</button>`)
-                                .click( () => {
-                                    loadForkLift(el.id)
+                    ({type, data}) => {
+                        locationForkLifts = data; 
+                        load(
+                            {
+                                "type":"ListOverview", 
+                                "devices": data.map(el => el.id), 
+                                "start": start,
+                                "end":   end
+                            }, 
+                            ({type, data}) => {
+                                $list = $('#list-devices').html('');
+
+                                data.forEach( ({id, name, location, loadedTime, emptyTime})  => {
+                                    $listElem = $(`<div class="large-12 cell"></div>`)
+                                        .appendTo($list)
+                                    $(`<button>${name}</button>`)
+                                        .click( () => {
+                                            loadForkLift(id)
+                                        })
+                                        .appendTo($listElem)
+
+                                    totalTime = (loadedTime+emptyTime)/100;
+
+                                    $listElem.append(`<div class="bar-graph">\
+                                        <div class="loaded" style="width: ${ loadedTime/totalTime }%; "></div>\
+                                        <div class="empty"  style="width: ${  emptyTime/totalTime }%; "></div>\
+                                        <span>${loadedTime/totalTime | 0}%</span>
+                                        </div>`);
                                 })
-                                .appendTo($list)
-                        })
+                            }
+                        )
+
+                        
                     }
                 )
             }
 
             loadForkLift = (lift) => {
-
-                let today = new Date();
-
-                switch($('#duration').val()) {
-                    case 'day':
-                        start = new Date();
-                        end = new Date();
-                        break;
-
-                    case 'week':
-                        start = new Date().getMonday();
-                        end = start.addDays(6);
-                        break;
-
-                    case 'month':
-                        start = new Date(today.getFullYear(), getMonth(), 1);
-                        end   = new Date(today.getFullYear(), getMonth()+1, 0);
-                        break;
-
-                    case 'year':
-                        start = new Date(today.getFullYear(), 1, 1);
-                        end   = new Date(today.getFullYear()+1, 12, 31);
-                        break;
-                }
-
-                start.setHours(0,0,0,0);
-                end.setHours(23,59,59,0);
-
                 load(
                     {
-                        "type":"ListOverview", 
+                        "type":"ListData", 
                         "devices": [lift], 
                         "start": start,
                         "end":   end
                     }, 
                     ({type, data}) => {
                         $('#device').html('')
-                        data.forEach( ({id, name, location, loadedTime, emptyTime}) => {
-                        totalTime = loadedTime+emptyTime;
-                        $list = $('#device')
-                            .append('<h2>' + location + ' - ' + name + '</h2>')
-                            .append('<div class="bar-graph">\
-                                <div class="bar-graph-loaded" style="width: ' + (loadedTime/totalTime*100) + '%; "></div>\
-                                <div class="bar-graph-empty" style="width: ' + (emptyTime/totalTime*100) + '%; "></div>\
-                                </div>');
-                        })
+                        data.forEach( ({id, name, location, loadedTimes, emptyTimes}) => {
+                            $graph = $(`<div class="graph">`);
+                            $('#device')
+                                .append(`<h2>${location} - ${name}</h2>`)
+                                .append($graph);
 
+                            duration = (end-start)/1000; // 100% | 1day | 1week in seconds
+
+                            timeOffset = start.getTimezoneOffset() * 60;
+                            offset = (+start/1000)// -timeOffset; // offset (first day,hour) in seconds
+
+                            for(i = 0; i < 24; i++) {
+                                $graph.append(`<div class="line" style="left: ${i*(1/24)*100}%;"></div>`);
+                            }
+
+                            loadedTimes.map(([s,e]) => {
+                                s = (+new Date(s))/1000;
+                                e = (+new Date(e))/1000;
+
+                                $graph.append(`<div class="loaded" style="\
+                                    left: ${ (s-offset) * (1/duration) * 100}%;\
+                                    width: ${Math.ceil((e-s)/duration)/100}%;\
+                                    "></div>`);
+                            });
+
+                            emptyTimes.map(([s,e]) => {
+                                s = (+new Date(s))/1000;
+                                e = (+new Date(e))/1000;
+
+                                $graph.append(`<div class="empty" style="\
+                                    left: ${ (s-offset) * (1/duration) * 100}%;\
+                                    width: ${Math.ceil((e-s)/duration)/100}%;\
+                                    "></div>`);
+                            });
+
+                        });
                     }
                 )
             }
 
-            load = (data, success) => {
-                $.ajax({
-                    url: API_URL,
-                    data: JSON.stringify(data),
-                    type: "POST",
-                    success: success
-                });
-            }
-
-
             loadLocations();
         </script>
 
-        <script type="text/javascript">
-            Date.prototype.getMonday = function() {
-                var day = this.getDay();
-                return this.addDays( - day + (day == 0 ? -6 : 1) );
-            }
-
-            Date.prototype.addDays = function(days) {
-                return new Date(new Date(this).setDate(this.getDate() + days))
-            }
-
-        </script>
     </body>
 </html>

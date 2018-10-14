@@ -19,7 +19,7 @@ http.createServer(function (req, res) {
             handleConnection(body, res);
         } catch (err) {
             res.writeHead(500, {'Content-Type': 'text/html'});
-            res.end('<h1>Internal server error</h1> "' + err + '"');
+            res.end(`<h1>Internal server error</h1> "${ err }"`);
         }
     });
 }).listen(config.port);
@@ -54,7 +54,7 @@ handleConnection = (body, res) => {
 }
 
 sqlWrapper = (obj, res, query, func) => {
-    console.log(query);
+    // console.log(query);
     con.query(query).then(
         result => {
             obj.data = func(result);
@@ -71,7 +71,7 @@ listLocations = (obj, res) => {
     sqlWrapper(
         obj, 
         res, 
-        'SELECT location FROM forklift.device GROUP BY location ORDER BY location',
+        `SELECT location FROM forklift.device GROUP BY location ORDER BY location`,
         (result) => {return result.map(e => e.location)}
     )
 }
@@ -88,11 +88,11 @@ listDevices = (obj, res, json) => {
     sqlWrapper(
         obj, 
         res, 
-        'SELECT device.macaddress, name, location \
+        `SELECT device.macaddress, name, location \
             FROM forklift.device LEFT JOIN forklift.log ON device.macaddress = log.macaddress \
-            ' + (where.length > 0 ? ' WHERE ' + where.join(' AND ' ) : '') + ' \
+            ${ where.length > 0 ? ' WHERE ' + where.join(' AND ' ) : '' } \
             GROUP BY device.macaddress \
-            ORDER BY location',
+            ORDER BY location`,
         (result) => {
             return result.map(e => { return {
                 "id": e.macaddress,
@@ -123,22 +123,22 @@ listData = (obj, res, json) => {
     )
 }
 
-forDevices = (obj, res, json, func) => {
-    if(!json.devices || !Array.isArray(json.devices) || json.devices.length == 0 || !json.start || !json.end)
+forDevices = (obj, res, {type, devices, start, end}, func) => {
+    if(!devices || !Array.isArray(devices) || devices.length == 0 || !start || !end)
         throw "wrong arguments";
 
     let where = [
-        'start >= ' + con.escape(new Date(json.start)),
-        'end <= ' + con.escape(new Date(json.end)),
-        '(' + json.devices.map( id => 'device.macaddress = ' + con.escape(id) ).join(' OR ') + ')'
+        `start >= ${ con.escape(new Date(start)) }`, 
+        `end <= ${ con.escape(new Date(end)) }`,
+        `( ${ devices.map( id => 'device.macaddress = ' + con.escape(id) ).join(' OR ') } )`
     ];
 
     sqlWrapper(
         obj, 
         res, 
-        'SELECT * FROM forklift.device LEFT JOIN forklift.log ON device.macaddress = log.macaddress \
-            WHERE ' + where.join(' AND ') + '\
-            ORDER BY location, device.macaddress',
+        `SELECT * FROM forklift.device LEFT JOIN forklift.log ON device.macaddress = log.macaddress \
+            WHERE ${ where.join(' AND ') }\
+            ORDER BY location, device.macaddress`,
         (result) => {
             devices = []
             tmpDeviceMac = null;
