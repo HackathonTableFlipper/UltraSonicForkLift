@@ -1,3 +1,18 @@
+button {
+	border-radius: .1em;
+	border: 1px solid lightgray;
+	padding: .4em;
+	margin: .25em;
+	margin-bottom: .5em;
+}
+button:first-of-type {
+	margin-left: 0;
+}
+
+input, input[type="date"], select {
+	width: 10em;
+}
+
 .bar-graph {
 	display: block;
 	position: relative;
@@ -64,4 +79,26 @@
 .graph > div.empty {
 	height: 50%;
 	bottom: 0;
+}
+
+.overview,
+.overview-year {
+	width: 80%;
+	display: grid;
+	grid-gap: .5em;
+}	
+.overview {
+	grid-template-columns: repeat(7, 1fr);
+}
+
+.overview-year {
+	grid-template-columns: repeat(4, 1fr);
+}
+
+.overview > div,
+.overview-year > div {
+	background-color: lightgray;
+	border-radius: .3em;
+	border: 1px solid black;
+	width: 100%;
 }

@@ -43,13 +43,15 @@
                     <div id="list-locations">
                         loading...
                     </div> 
-                    <input type="date" value="2018-10-13" />         
-                    <select id="duration">
-                        <option value="day">Day</option>
-                        <option value="week">Week</option>
-                        <option value="month">Month</option>
-                        <option value="year">Year</option>
-                    </select>
+                    <div style="display: grid; grid-template-columns: 10em 10em; grid-gap: .5em;">
+                        <input type="date" value="2018-10-13" />         
+                        <select id="duration">
+                            <option value="day">Day</option>
+                            <option value="week">Week</option>
+                            <option value="month">Month</option>
+                            <option value="year">Year</option>
+                        </select>
+                    </div>
                 </div>
                 <div class="large-12 cell">
                     <h2>Devices</h2>
@@ -72,6 +74,9 @@
             let start = null;
             let end = null;
 
+            let currentLocation = null;
+            let currentDevice = null;
+
             getDate = () => {
                 today = new Date($('input[type="date"]').val());
                 getDuration();
@@ -87,7 +92,7 @@
 
                     case 'week':
                         start = today.getMonday();
-                        end = start.addDays(6);
+                        end = start.addDays(7);
                         break;
 
                     case 'month':
@@ -105,13 +110,27 @@
                 // end.setHours(23,59,59,0);
             }
 
-            $('#duration').change( getDuration );
+            $('#duration').change( () => {
+                getDuration()
+                reload()
+            } );
             getDuration();
 
             $('input[type="date"]')
                 .val(new Date().toISOString().split('T')[0])
-                .change( getDate );
+                .change( () => {
+                    getDate()
+                    reload()
+                } );
 
+            reload = () => {
+                if(currentDevice) {
+                    loadForkLift(currentDevice)
+                }
+                if(currentLocation) {
+                    loadForkLifts(currentLocation);
+                }
+            }
 
             loadLocations = () => {
                 load(
@@ -122,6 +141,7 @@
                             $(`<button>${el}</button>`)
                                 .click( () => {
                                     loadForkLifts(el)
+                                    currentLocation = el;
                                 })
                                 .appendTo($list)
                         })
@@ -150,6 +170,7 @@
                                     $(`<button>${name}</button>`)
                                         .click( () => {
                                             loadForkLift(id)
+                                            currentDevice = id;
                                         })
                                         .appendTo($listElem)
 
@@ -160,7 +181,18 @@
                                         <div class="empty"  style="width: ${  emptyTime/totalTime }%; "></div>\
                                         <span>${loadedTime/totalTime | 0}%</span>
                                         </div>`);
+
                                 })
+
+                                locationForkLifts
+                                    .filter( ({id}) => !data.map(el => el.id).includes(id))
+                                    .forEach( ({id, name, location}) => {
+                                        $listElem = $(`<div class="large-12 cell"></div>`)
+                                            .appendTo($list)
+                                            .append(`<button>${name}</button>`)
+
+                                    })
+
                             }
                         )
 
@@ -180,39 +212,120 @@
                     ({type, data}) => {
                         $('#device').html('')
                         data.forEach( ({id, name, location, loadedTimes, emptyTimes}) => {
-                            $graph = $(`<div class="graph">`);
-                            $('#device')
-                                .append(`<h2>${location} - ${name}</h2>`)
-                                .append($graph);
+                            
+                            $device = $('#device')
+                                .append(`<h2>${location} - ${name}</h2>`);
 
-                            duration = (end-start)/1000; // 100% | 1day | 1week in seconds
+                            switch($('#duration').val()) {
+                                case 'day': {
+                                        $graph = $(`<div class="graph">`).appendTo($device);
+                                        duration = (end-start)/1000; // 100% | 1day | 1week in seconds
 
-                            timeOffset = start.getTimezoneOffset() * 60;
-                            offset = (+start/1000)// -timeOffset; // offset (first day,hour) in seconds
+                                        timeOffset = start.getTimezoneOffset() * 60;
+                                        offset = (+start/1000)// -timeOffset; // offset (first day,hour) in seconds
 
-                            for(i = 0; i < 24; i++) {
-                                $graph.append(`<div class="line" style="left: ${i*(1/24)*100}%;"></div>`);
+                                        for(i = 0; i < 24; i++) {
+                                            $graph.append(`<div class="line" style="left: ${i*(1/24)*100}%;"></div>`);
+                                        }
+
+                                        loadedTimes.map(([s,e]) => {
+                                            s = (+new Date(s))/1000;
+                                            e = (+new Date(e))/1000;
+
+                                            $graph.append(`<div class="loaded" style="\
+                                                left: ${ (s-offset) * (1/duration) * 100}%;\
+                                                width: ${Math.ceil((e-s)/duration)/100}%;\
+                                                "></div>`);
+                                        });
+
+                                        emptyTimes.map(([s,e]) => {
+                                            s = (+new Date(s))/1000;
+                                            e = (+new Date(e))/1000;
+
+                                            $graph.append(`<div class="empty" style="\
+                                                left: ${ (s-offset) * (1/duration) * 100}%;\
+                                                width: ${Math.ceil((e-s)/duration)/100}%;\
+                                                "></div>`);
+                                        });
+                                    }
+                                    break;
+                                
+                                case 'week':
+                                case 'month': {
+                                        days = (end-start) / (1000*60*60*24) | 0;
+                                        $overview = $(`<div class="overview"></div>`).appendTo($device);
+
+                                        loadedTimes = loadedTimes.map(([s,e]) => { return [ new Date(s), new Date(e) ]} );
+                                         emptyTimes =  emptyTimes.map(([s,e]) => { return [ new Date(s), new Date(e) ]} );
+
+                                        loaded = [];
+                                        empty = [];
+                                        dayS = new Date(start);
+                                        dayE = new Date(start);
+                                        for(i = 0; i < days; i++) {
+                                            dayS = new Date(dayE);
+                                            dayE = new Date(+dayS+(1000*60*60*24));
+
+                                            loaded.push( loadedTimes.filter(([s,e]) => (s > dayS && e < dayE)) );
+                                             empty.push(  emptyTimes.filter(([s,e]) => (s > dayS && e < dayE)) );
+
+                                        }
+
+                                        ['Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa', 'Su'].map(e => $overview.append(`<div>${e}</div>`))
+                                        
+                                        for(i = 0; i < days; i++) {
+                                            loadedTime = loaded[i].reduce((acc, [s,e]) => acc+(e-s), 0);
+                                             emptyTime =  empty[i].reduce((acc, [s,e]) => acc+(e-s), 0);
+
+                                             console.log({loadedTime})
+
+                                            totalTime = (loadedTime+emptyTime)/100; 
+
+                                            $overview.append(`<div class="bar-graph">\
+                                                <div class="loaded" style="width: ${ loadedTime/totalTime }%; "></div>\
+                                                <div class="empty"  style="width: ${  emptyTime/totalTime }%; "></div>\
+                                                </div>`);
+                                        }
+
+                                    }
+                                    break;
+
+                                case 'year': {
+                                        $overview = $(`<div class="overview-year"></div>`).appendTo($device);
+
+                                        loadedTimes = loadedTimes.map(([s,e]) => { return [ new Date(s), new Date(e) ]} );
+                                         emptyTimes =  emptyTimes.map(([s,e]) => { return [ new Date(s), new Date(e) ]} );
+
+                                        loaded = [];
+                                        empty = [];
+                                        dayS = null;
+                                        dayE = new Date(start.getFullYear(), start.getMonth(), 1);
+                                        for(i = 0; i < 12; i++) {
+                                            dayS = new Date(dayE);
+                                            dayE = new Date(dayS.getFullYear(), dayS.getMonth()+1, 1);
+
+                                            loaded.push( loadedTimes.filter(([s,e]) => (s > dayS && e < dayE)) );
+                                             empty.push(  emptyTimes.filter(([s,e]) => (s > dayS && e < dayE)) );
+
+                                        }
+
+                                        for(i = 0; i < 12; i++) {
+                                            loadedTime = loaded[i].reduce((acc, [s,e]) => acc+(e-s), 0);
+                                             emptyTime =  empty[i].reduce((acc, [s,e]) => acc+(e-s), 0);
+
+                                             console.log({loadedTime})
+
+                                            totalTime = (loadedTime+emptyTime)/100; 
+
+                                            $overview.append(`<div class="bar-graph">\
+                                                <div class="loaded" style="width: ${ loadedTime/totalTime }%; "></div>\
+                                                <div class="empty"  style="width: ${  emptyTime/totalTime }%; "></div>\
+                                                </div>`);
+                                        }
+
+                                    }
+                                    break;
                             }
-
-                            loadedTimes.map(([s,e]) => {
-                                s = (+new Date(s))/1000;
-                                e = (+new Date(e))/1000;
-
-                                $graph.append(`<div class="loaded" style="\
-                                    left: ${ (s-offset) * (1/duration) * 100}%;\
-                                    width: ${Math.ceil((e-s)/duration)/100}%;\
-                                    "></div>`);
-                            });
-
-                            emptyTimes.map(([s,e]) => {
-                                s = (+new Date(s))/1000;
-                                e = (+new Date(e))/1000;
-
-                                $graph.append(`<div class="empty" style="\
-                                    left: ${ (s-offset) * (1/duration) * 100}%;\
-                                    width: ${Math.ceil((e-s)/duration)/100}%;\
-                                    "></div>`);
-                            });
 
                         });
                     }
