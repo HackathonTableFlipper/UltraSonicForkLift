@@ -17,8 +17,15 @@
 
 #include "Header/ForkLiftClient.h"
 #include "Header/sonicClockMinimal.h"
+#include "Header/protocol.h"
 
-SoftwareSerial esp8266(RX,TX);
+#define RX 10
+#define TX 11
+#define DEBUG true
+
+#include <SoftwareSerial.h>
+#include "Header/ESP.h"
+
 String AP = "hackathon";
 String PASS = "tomdockle";
 
@@ -32,6 +39,8 @@ char reply[500]; // you wouldn't normally do this
  char name[30];
  int lenHtml = 0;
  char temp[5];
+
+ SoftwareSerial esp8266(RX,TX);
 
 void setup()
 {
@@ -48,15 +57,14 @@ void setup()
   //setupServer();
 
   //TODO if not: Open a server
-  //setupClient();
+  setupClient();
 
-  //Serial.println("bla " + getConfigPage());
   Serial.println(setupSonicClockMinimal());
-
 }
 
 void setupClient(){
-	//sendData("AT+CWJAP=\""+ AP +"\",\""+ PASS +"\"",20,false);
+	sendData("AT+CWJAP=\""+ AP +"\",\""+ PASS +"\"",20,true);
+	sendData("AT+CIPMODE=0\r\n",20,true);
 }
 
 void setupServer(){
@@ -105,33 +113,6 @@ int connectionId = 0;
              sendData(cipSend,1000,DEBUG);
              sendData(d,1000,DEBUG);
          }
-
-//////////////gets the data from esp and displays in serial monitor///////////////////////
-String sendData(String command, const int timeout, boolean debug)
-            {
-                String response = "";
-                esp8266.print(command + "\r\n");
-                long int time = millis();
-                while( (time+timeout) > millis())
-                {
-                   while(esp8266.available())
-                      {
-                         char c = esp8266.read(); // read the next character.
-                         response+=c;
-                      }
-                }
-
-                if(debug)
-                     {
-                     Serial.println("ESP: " + response); //displays the esp response messages in arduino Serial monitor
-                     }
-                return response;
-            }
-
-
-bool sendDataToRaspberry(int gabelstabler_id,bool, float startTime, float endTime){
-	return false;
-}
 
 //const String getConfigPage(){
 //	String webpage_index = "<!DOCTYPE html>" ;
