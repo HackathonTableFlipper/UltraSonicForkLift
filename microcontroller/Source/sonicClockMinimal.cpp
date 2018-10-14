@@ -1,11 +1,8 @@
-#include <Wire.h>
-#include "NewPing.h"
-#include "RTClib.h"
-
+#include "../Header/sonicClockMinimal.h"
 
 #define CALKEY 7
-#define TRIGGER_PIN  11
-#define ECHO_PIN     12
+#define TRIGGER_PIN  12
+#define ECHO_PIN     13
 #define MAX_DISTANCE 13 //In centimeter
  
 NewPing sonar(TRIGGER_PIN, ECHO_PIN, MAX_DISTANCE);
@@ -15,14 +12,14 @@ int16_t state=0,state2=0;
 bool payloadState=true;
 
 
-void setup() {
+String setupSonicClockMinimal() {
+	String returnStr = "setup sonicClockMinimal: ";
   Wire.begin();
-  Serial.begin(115200);
   if (! rtc.begin()) {
-    Serial.println("Couldn't find RTC");
+	  returnStr += "Couldn't find RTC";
   }
   if (rtc.lostPower()) {
-     Serial.println("RTC lost power, lets set the time!");
+     returnStr += "RTC lost power, lets set the time!";
     // following line sets the RTC to the date & time this sketch was compiled
     rtc.adjust(DateTime(F(__DATE__), F(__TIME__)));
     // This line sets the RTC with an explicit date & time, for example to set
@@ -31,25 +28,26 @@ void setup() {
   }
   pinMode(CALKEY, INPUT); //Taster
 
-  //BenÃ¶tigt, damit der Taster zwischen high und low umschalten kann
+  //Benötigt, damit der Taster zwischen high und low umschalten kann
   pinMode(5,OUTPUT);
   pinMode(6,OUTPUT);
   digitalWrite(6,HIGH);
   digitalWrite(5,LOW);
+  return returnStr;
 }
 
-void loop() {
+String loopSonicClockMinimal() {
         delay(30);  //Nicht zu schnell mit dem Ultraschallsensor pingen
-
+        String returnStr = "";
         //Debounce der Palette
         state = ((state<<1) | (sonar.ping()!=0)^payloadState | 0xe000);
         if (state==0xf000) {
           
         //RTC auslesen
           DateTime now = rtc.now();
-          Serial.print(now.unixtime());
+          returnStr += now.unixtime() + "; ";
           
-          Serial.println(payloadState?": Ladung aufgenommen":": Ladung entfernt");
+          //returnStr += now.unixtime() ":" + (payloadState ?": Ladung aufgenommen":": Ladung entfernt") + "; ";
           payloadState= !payloadState;
         }
 
@@ -59,8 +57,7 @@ void loop() {
                     
         //RTC auslesen
           DateTime now = rtc.now();
-          Serial.print(now.unixtime());
-          
-          Serial.println(": Taster gedrÃ¼ckt");
+          returnStr += now.unixtime() + ": Taster gedrückt";
         }
+        return returnStr;
 }
