@@ -1,23 +1,67 @@
 .bar-graph {
 	display: block;
+	position: relative;
 	width: 80%;
 	border-radius: .3em;
 	height: 2em;
 	border: 1px solid black;
 	display: flex;
 	justify-content: space-around;
+	overflow: hidden;
+}
+
+.bar-graph > span {
+	display: block;
+	position: absolute;
+	height: 100%;
+
+	left: 50%;
+	margin-left: -1em;
+	width: 2em;
+	line-height: 2em;
+	vertical-align: center;
 }
 
 .bar-graph > .bar-graph-loaded,
 .bar-graph > .bar-graph-empty {
-	height: 100%;
 	display: block;
+	height: 100%;
 }
 
-.bar-graph > .bar-graph-loaded {
+.loaded {
 	background-color: #80f080;;
 }
 
-.bar-graph > .bar-graph-empty {
+.empty {
 	background-color: #f08080;;
+}
+
+.graph {
+	display: block;
+	position: relative;
+	width: 100%;
+	border-radius: .3em;
+	height: 2em;
+	border: 1px solid black;
+	background-color: #ccc;
+}
+
+.graph > div {
+	display: block;
+	position: absolute;
+	height: 100%;
+	min-width: 1px;
+}
+
+.graph > div.line {
+	background-color: black;
+	width: 1px;
+}
+.graph > div.loaded {
+	height: 50%;
+	top: 0;
+}
+.graph > div.empty {
+	height: 50%;
+	bottom: 0;
 }
