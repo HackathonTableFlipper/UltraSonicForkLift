@@ -1,23 +1,69 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>Webserver</title>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= content_for?(:title) ? yield(:title) : "Webserver" %></title>
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
 
-    <%= stylesheet_link_tag    'application', media: 'all', 'data-turbolinks-track': 'reload' %>
-    <%= javascript_include_tag 'application', 'data-turbolinks-track': 'reload' %>
+    <%= stylesheet_link_tag "application", :media => "all" %>
+
+    <%= javascript_include_tag "application" %>
+
+    <!-- Le HTML5 shim, for IE6-8 support of HTML elements -->
+    <!--[if lt IE 9]>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.2/html5shiv.min.js" type="text/javascript"></script>
+    <![endif]-->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
     <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+    <style>
+      th, td {padding-right: 30px;}
+    </style>
   </head>
 
   <body>
-    <p>Navigation</p>
-    <ul>
-      <li><%= link_to 'Settings', settings_edit_url %></li>
-      <li><%= link_to 'Locations', location_list_url %></li>
-      <li><%= link_to 'Devices', device_list_url %></li>
-      <li><%= link_to 'Overview', overview_list_url %></li>
-    </ul>
-    <%= yield %>
+
+    <div class="navbar navbar-default navbar-static-top">
+      <div class="container">
+        <a class="navbar-brand" href="#">Webserver</a>
+        <div class="navbar-collapse collapse navbar-responsive-collapse">
+          <ul class="nav navbar-nav">
+            <li><%= link_to 'Settings', settings_edit_url %></li>
+            <li><%= link_to 'Locations', location_list_url %></li>
+            <li><%= link_to 'Devices', device_list_url %></li>
+            <li><%= link_to 'Overview', overview_list_url %></li>
+            <li><%= link_to 'Graph', graph_list_url %></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="container">
+      <div class="row">
+        <div class="col-lg-9">
+          <%= bootstrap_flash %>
+          <%= yield %>
+        </div>
+        <div class="col-lg-3">
+          <div class="well sidebar-nav">
+            <h3>Navigation</h3>
+            <ul style="list-style-type: none">
+              <li><%= link_to 'Settings', settings_edit_url %></li>
+              <li><%= link_to 'Locations', location_list_url %></li>
+              <li><%= link_to 'Devices', device_list_url %></li>
+              <li><%= link_to 'Overview', overview_list_url %></li>
+              <li><%= link_to 'Graph', graph_list_url %></li>
+            </ul>
+          </div><!--/.well -->
+        </div><!--/span-->
+      </div><!--/row-->
+
+    </div> <!-- /container -->
+
   </body>
 </html>

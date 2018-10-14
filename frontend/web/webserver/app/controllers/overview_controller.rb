@@ -3,29 +3,40 @@ class OverviewController < ApplicationController
   include OverviewHelper
 
   def update
-      pIds = params[:ids] 
-      if (pIds != null)
-          pIdList = pIds.split(",")
-          pIdList.map!(&:chomp!)
-          @ids = pIdList
-      else
-          @ids = getAllDevices
+      if (params["ids"] != nil)
+        Rails.configuration.ids = params["ids"].split(",").map(&:strip)
       end
-      @startTime = params[:startTime] || "2018-10-13 00:00:00"
-      @endTime = params[:endTime] || "2999-01-01 00:00:00"
+      Rails.configuration.startTime = params["startTime"]
+      Rails.configuration.endTime = params["endTime"]
     
       redirect_to overview_list_path
       return
   end
 
   def list
+    if (Rails.configuration.ids == nil || Rails.configuration.ids.empty?)
+      @ids = getAllDevices
+    else
+      @ids = Rails.configuration.ids
+    end
+    if (Rails.configuration.startTime == nil)
+      @startTime = "2018-10-13 00:00:00"
+    else
+      @startTime = Rails.configuration.startTime
+    end
+    if (Rails.configuration.endTime == nil)
+      @endTime = "2999-01-01 00:00:00"
+    else
+      @endTime = Rails.configuration.endTime
+    end
     begin
-      puts getAllDevices()
+      response = {"type" => "ListOverview",
+              "data" => [{"loadedTime" => 3,
+              "emptyTime" => 4}]}
       response = getJsonForType({:type => "ListOverview",
                     "devices" => @ids,
                     "start" => @startTime,
                     "end" => @endTime})
-      puts response
     rescue Errno::EHOSTUNREACH
       redirect_to settings_edit_path
       return

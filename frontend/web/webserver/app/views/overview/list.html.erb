@@ -1,7 +1,7 @@
 <h1>Overview</h1>
 
   <%= form_with url: overview_update_path do |form| %>
-    <%= form.text_field :ids, :value => @ids %>
+    <%= form.text_field :ids, :value => @ids.join(", ") %>
     <%= form.text_field :startTime, :value => @startTime %>
     <%= form.text_field :endTime, :value => @endTime %>
     <%= form.submit %>
@@ -9,10 +9,10 @@
 
 
 <table>
-  <tr><th>Zeile</th><th>Zeit</th><th>beladen</th><th>unbeladen</th><th>%</th></tr>
+  <tr><th>ID</th><th>Zeit (sek)</th><th>beladen (sek)</th><th>unbeladen (sek)</th><th>% der beladen Zeit</th></tr>
   <% @overviewEntries.each.with_index do |overview, index| %>
     <tr>
-      <td><%= index %></td>
+      <td><%= overview["id"] %></td>
       <td><%= overview["time"] %></td>
       <td><%= overview["loadedTime"] %></td>
       <td><%= overview["emptyTime"] %></td>
