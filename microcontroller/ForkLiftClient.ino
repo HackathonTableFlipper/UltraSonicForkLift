@@ -17,8 +17,15 @@
 
 #include "Header/ForkLiftClient.h"
 #include "Header/sonicClockMinimal.h"
+#include "Header/protocol.h"
 
-SoftwareSerial esp8266(RX,TX);
+#define RX 10
+#define TX 11
+#define DEBUG true
+
+#include <SoftwareSerial.h>
+#include "Header/ESP.h"
+
 String AP = "hackathon";
 String PASS = "tomdockle";
 
@@ -32,6 +39,8 @@ char reply[500]; // you wouldn't normally do this
  char name[30];
  int lenHtml = 0;
  char temp[5];
+
+ SoftwareSerial esp8266(RX,TX);
 
 void setup()
 {
@@ -50,13 +59,15 @@ void setup()
   //TODO if not: Open a server
   //setupClient();
 
-  //Serial.println("bla " + getConfigPage());
   Serial.println(setupSonicClockMinimal());
 
+  //logData(true, DateTime(1,1,1,1,1,1), DateTime(1,1,1,1,1,1));
 }
 
 void setupClient(){
-	//sendData("AT+CWJAP=\""+ AP +"\",\""+ PASS +"\"",20,false);
+	sendData("AT+CWMODE=1",200,false); // configure as access point
+	sendData("AT+CWJAP=\""+ AP +"\",\""+ PASS +"\"",200,true);
+	sendData("AT+CIPMODE=0\r\n",200,true);
 }
 
 void setupServer(){
